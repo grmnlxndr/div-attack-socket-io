@@ -1,0 +1,90 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+div#nickname {
+	height: 100vh;
+	width: 100vw;
+	background: darkcyan;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+div#nickname div#form {
+	background-color: darkblue;
+	color: white;
+	text-align: center;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+div#nickname div#form input#nickInput {
+	background: darkblue;
+	border-width: 0 0 3px 0;
+	border-color: white;
+	color: white;
+	font-weight: bold;
+	padding: 5px;
+	text-align: center;
+
+}
+
+div#nickname div#form input#nickInput:focus {
+	outline: none;
+}
+
+div#nickname div#form button#ingresar {
+	background: darkcyan;
+	color: white;
+	padding: 5px;
+	font-weight: bold;
+	border: none;
+}
+
+p#error {
+	font-weight: bold;
+	color: red;
+	font-size: 1.2em;
+}
+
+h2#fachero {
+	text-shadow: 0px 0px 6px cyan;
+}
+
+div#display {
+	height: 100vh;
+	width: 100vw;
+	background: aliceblue;
+	overflow: hidden;
+
+}
+
+div.divcito {
+	background: red;
+	width: 200px;
+	height: 200px;
+	position: absolute;
+	top: 50px;
+	left: 50px;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+
+div.divcito p, div.divcito h3 {
+	cursor: pointer;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}

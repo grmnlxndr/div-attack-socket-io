@@ -33,15 +33,16 @@ io.on('connection', function(socket){
 		socket.broadcast.emit('moviendo div', user, rLeft, rTop);
 	});
 	socket.on('disconnect', function() {
-		var k = sockets.indexOf(socket);
-		var muerto = users[k];
+		var index = sockets.indexOf(socket);
+		var muerto = users[index];
 		console.log(muerto +' desconectado');
 		socket.broadcast.emit('div muerto', muerto);
-		delete sockets[k];
-		delete users[k];
-		delete left[k];
-		delete top[k];
-
+		if (index > -1) {
+		    sockets.splice(index, 1);
+		    users.splice(index, 1);
+		    left.splice(index, 1);
+		    top.splice(index, 1);
+		}
 	})
 });
 

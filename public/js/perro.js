@@ -56,6 +56,7 @@ socket.on('moviendo div', function(user, left,top) {
 
 //capturar quien sigue conectado
 socket.on('div muerto', function(user) {
-	conectados.pull(user);
 	$('#'+user).remove();
+	var k = conectados.indexOf(user);
+	delete conectados[k];
 });

@@ -79,7 +79,11 @@ io.on('connection', function(socket){
 		    left.splice(index, 1);
 		    top.splice(index, 1);
 		}
-	})
+	});
+
+	socket.on('disparo', function(code,left,top){
+		socket.broadcast.emit('disparo',code,left,top);
+	});
 });
 
 // iniciar el server en el puerto designado

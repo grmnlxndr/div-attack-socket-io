@@ -61,7 +61,6 @@ div#display {
 	width: 100vw;
 	background: aliceblue;
 	overflow: hidden;
-
 }
 
 div.divcito {
@@ -136,4 +135,21 @@ div#usuarios li {
 li#tu {
 	font-weight: bold;
 	font-style: italic;
+}
+
+div.flecha{
+	background-color: black;
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	border-radius: 5px;
+	left: 0px;
+	top: 0px;
+	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;	
 }

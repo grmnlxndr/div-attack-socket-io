@@ -3,6 +3,7 @@ var socket = io();
 
 var nickname; // Nombre propio
 var conectados = []; // Nombre de los jugadores
+var disparos = 5; // Disparos permitidos
 
 // Ocultar error y pantalla principal
 $('div#display').hide();
@@ -38,9 +39,21 @@ $('form#login').submit(function() {
 			$('.divcito#'+nickname).css('left',e.pageX - 100).css('top',e.pageY - 100);
 			
 			// emitir evento de movimiento
-			socket.emit('moviendo div', nickname,$('#'+nickname).css('left'), $('#'+nickname).css('top'));
+			socket.emit('moviendo div', nickname,$('.divcito#'+nickname).css('left'), $('.divcito#'+nickname).css('top'));
 		};
+	});
 
+	// Darle opción de disparo
+	$(document).keydown(function(e){
+		if (disparos > 0){
+			if(e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40){
+				disparos = disparos - 1;
+				var lft = parseInt($('.divcito#'+nickname).css('left').replace("px",""));
+				var tp = parseInt($('.divcito#'+nickname).css('top').replace("px",""));
+				socket.emit('disparo',e.keyCode,lft,tp); 
+				disparar(e.keyCode,lft,tp,true);
+			}
+		}
 	});
 
 	// Agregarse a sí mismo a la lista de usuarios conectados
@@ -101,4 +114,55 @@ socket.on('div muerto', function(user) {
 	if (index > -1) {
 	    conectados.splice(index, 1);
     }
+});
+
+//Disparar una flecha
+function disparar(code,left,top,local){
+	var fondo = $('div#display');
+	var bala = $('<div class="flecha"></div>');
+	var direc = "";
+	var sent = 1;
+	//Izquierda
+	if(code === 37){
+		bala.css("left",left+'px').css("top",(top+95)+'px');
+		direc = "left";
+		sent = -1;
+	}
+	//Arriba
+	if(code === 38){
+		bala.css("left",(left+95)+'px').css("top",top+'px');
+		direc = "top";
+		sent = -1;
+	}
+	//Derecha
+	if(code === 39){
+		bala.css("left",(left+190)+'px').css("top",(top+95)+'px');
+		direc = "left";
+		sent = 1;
+	}
+	//Abajo
+	if(code === 40){
+		bala.css("left",(left+95)+'px').css("top",(top+190)+'px');
+		direc = "top";
+		sent = 1;
+	}
+	fondo.append(bala);
+	var movBala = setInterval(function(){ mover(bala,direc,sent) }, 50);
+	var stop = setTimeout(
+		function(){ 
+			window.clearInterval(movBala); 
+			bala.remove(); 
+			if(local){ 
+				disparos=disparos+1; 
+			};
+		}, 5000);
+}
+
+function mover(bala,direccion,sentido){
+	var valor = parseInt(bala.css(direccion).replace("px"));
+	bala.css(direccion,(valor + (sentido * 10) + 'px'));
+}
+
+socket.on('disparo',function(code,left,top){
+	disparar(code,left,top,false);
 });

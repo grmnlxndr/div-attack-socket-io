@@ -89,3 +89,25 @@ div.divcito p, div.divcito h3 {
 	-ms-user-select: none;
 	user-select: none;
 }
+
+div#usuarios {
+	position: absolute;
+	top: 50px;
+	right: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	background: darkslategrey;
+	border-radius: 5px;
+	color: white;
+}
+
+div#usuarios div {
+	margin: 5px;	
+}
+
+li#tu {
+	font-weight: bold;
+	font-style: italic;
+}

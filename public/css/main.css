@@ -77,11 +77,11 @@ div.divcito {
 	justify-content: center;
 	color: white;
 	text-align: center;
-	cursor: pointer;
+	cursor: default;
 }
 
 div.divcito p, div.divcito h3 {
-	cursor: pointer;
+	cursor: default;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -101,11 +101,37 @@ div#usuarios {
 	background: darkslategrey;
 	border-radius: 5px;
 	color: white;
+	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 div#usuarios div {
-	margin: 5px;	
+	margin: 5px;
+	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;	
 }
+
+div#usuarios h3,
+div#usuarios ul,
+div#usuarios li {
+	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;	
+} 
 
 li#tu {
 	font-weight: bold;

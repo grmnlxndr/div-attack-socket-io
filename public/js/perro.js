@@ -30,7 +30,7 @@ $('form#login').submit(function() {
 	socket.emit('ingresar', nickname);
 
 	// Agregar el div propio para jugar
-	$('div#display').append($('<div style="z-index:999; background:darkcyan;" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
+	$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
 
 	// Darle movimiento con el click y arrastrar
 	$('#'+nickname).mousemove(function(e) {

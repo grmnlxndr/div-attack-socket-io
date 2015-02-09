@@ -77,6 +77,7 @@ io.on('connection', function(socket){
 		if (index > -1) {
 		    sockets.splice(index, 1);
 		    users.splice(index, 1);
+		    lifes.splice(index, 1);
 		    left.splice(index, 1);
 		    top.splice(index, 1);
 		}

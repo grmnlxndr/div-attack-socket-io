@@ -3,7 +3,6 @@ var socket = io();
 
 var nickname; // Nombre propio
 var conectados = []; // Nombre de los jugadores
-var lifes = []; //Vidas de los jugadores ?????
 var disparos = 5; // Disparos permitidos
 
 // Ocultar error y pantalla principal
@@ -35,13 +34,18 @@ $('form#login').submit(function() {
 	$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
 
 	// Darle movimiento con el click y arrastrar
-	$('#'+nickname).mousemove(function(e) {
-		if (e.which === 1) {
-			$('.divcito#'+nickname).css('left',e.pageX - 100).css('top',e.pageY - 100);
-			
-			// emitir evento de movimiento
-			socket.emit('moviendo div', nickname,$('.divcito#'+nickname).css('left'), $('.divcito#'+nickname).css('top'));
-		};
+	$('#'+nickname).mousedown(function() {
+		$(document).mousemove(function(e) {
+			if (e.which === 1) {
+				$('.divcito#'+nickname).css('left',e.pageX - 50).css('top',e.pageY - 50);
+				
+				// emitir evento de movimiento
+				socket.emit('moviendo div', nickname,$('.divcito#'+nickname).css('left'), $('.divcito#'+nickname).css('top'));
+			};
+		})
+		.mouseup(function() {
+			$(document).off('mousemove');
+		});
 	});
 
 	// Darle opción de disparo
@@ -125,25 +129,25 @@ function disparar(code,left,top,agresor){
 	var sent = 1;
 	//Izquierda
 	if(code === 37){
-		bala.css("left",(left-20)+'px').css("top",(top+95)+'px');
+		bala.css("left",(left-20)+'px').css("top",(top+45)+'px');
 		direc = "left";
 		sent = -1;
 	}
 	//Arriba
 	if(code === 38){
-		bala.css("left",(left+95)+'px').css("top",(top-20)+'px');
+		bala.css("left",(left+45)+'px').css("top",(top-20)+'px');
 		direc = "top";
 		sent = -1;
 	}
 	//Derecha
 	if(code === 39){
-		bala.css("left",(left+210)+'px').css("top",(top+95)+'px');
+		bala.css("left",(left+110)+'px').css("top",(top+45)+'px');
 		direc = "left";
 		sent = 1;
 	}
 	//Abajo
 	if(code === 40){
-		bala.css("left",(left+95)+'px').css("top",(top+210)+'px');
+		bala.css("left",(left+45)+'px').css("top",(top+110)+'px');
 		direc = "top";
 		sent = 1;
 	}
@@ -159,11 +163,11 @@ function disparar(code,left,top,agresor){
 		}, 5000);
 }
 
+// Mueve las balas
 function mover(bala,direccion,sentido,agresor){
-	//var yo = nickname;
+	
 	var valor = parseInt(bala.css(direccion).replace("px"));
 	bala.css(direccion,(valor + (sentido * 10) + 'px'));
-	//var collides = $('.divcito#'+yo).overlaps(bala);
 	var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
 	if (collides.targets.length != 0) {
 		var herido = $(collides.targets[0]).attr('id');
@@ -175,10 +179,12 @@ function mover(bala,direccion,sentido,agresor){
 	}
 }
 
+// Escuchar los disparos de los demás jugadores
 socket.on('disparo',function(code,left,top,agresor){
 	disparar(code,left,top,agresor);
 });
 
+// Escuchar a los heridos de balas
 socket.on('heridolife',function(herido,agresor,life){
 	$('.divcito#' + herido + ' .life').text(life);
 });

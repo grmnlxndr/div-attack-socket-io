@@ -151,5 +151,6 @@ div.flecha{
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	user-select: none;	
+	user-select: none;
+	z-index:999;	
 }

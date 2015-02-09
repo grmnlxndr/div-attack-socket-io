@@ -13,7 +13,7 @@ $('#error').hide();
 $('form#login').submit(function() {
 	
 	// Obtener nickname y eliminar los espacios
-	var nickname = $('input#nickInput').val();
+	nickname = $('input#nickInput').val();
 	nickname = nickname.replace(/ /g,'-');
 	
 	// Controlar que no exista nadie con el mismo nickname y mostrar error
@@ -50,8 +50,8 @@ $('form#login').submit(function() {
 				disparos = disparos - 1;
 				var lft = parseInt($('.divcito#'+nickname).css('left').replace("px",""));
 				var tp = parseInt($('.divcito#'+nickname).css('top').replace("px",""));
-				socket.emit('disparo',e.keyCode,lft,tp); 
-				disparar(e.keyCode,lft,tp,true);
+				socket.emit('disparo',e.keyCode,lft,tp,nickname); 
+				disparar(e.keyCode,lft,tp,nickname);
 			}
 		}
 	});
@@ -117,57 +117,60 @@ socket.on('div muerto', function(user) {
 });
 
 //Disparar una flecha
-function disparar(code,left,top,local){
+function disparar(code,left,top,agresor){
 	var fondo = $('div#display');
 	var bala = $('<div class="flecha"></div>');
 	var direc = "";
 	var sent = 1;
 	//Izquierda
 	if(code === 37){
-		bala.css("left",left+'px').css("top",(top+95)+'px');
+		bala.css("left",(left-20)+'px').css("top",(top+95)+'px');
 		direc = "left";
 		sent = -1;
 	}
 	//Arriba
 	if(code === 38){
-		bala.css("left",(left+95)+'px').css("top",top+'px');
+		bala.css("left",(left+95)+'px').css("top",(top-20)+'px');
 		direc = "top";
 		sent = -1;
 	}
 	//Derecha
 	if(code === 39){
-		bala.css("left",(left+190)+'px').css("top",(top+95)+'px');
+		bala.css("left",(left+210)+'px').css("top",(top+95)+'px');
 		direc = "left";
 		sent = 1;
 	}
 	//Abajo
 	if(code === 40){
-		bala.css("left",(left+95)+'px').css("top",(top+190)+'px');
+		bala.css("left",(left+95)+'px').css("top",(top+210)+'px');
 		direc = "top";
 		sent = 1;
 	}
 	fondo.append(bala);
-	var movBala = setInterval(function(){ mover(bala,direc,sent) }, 50);
+	var movBala = setInterval(function(){ if (bala) {mover(bala,direc,sent,agresor)} }, 50);
 	var stop = setTimeout(
 		function(){ 
 			window.clearInterval(movBala); 
 			bala.remove(); 
-			if(local){ 
+			if(agresor === nickname){ 
 				disparos=disparos+1; 
 			};
 		}, 5000);
 }
 
-function mover(bala,direccion,sentido){
+function mover(bala,direccion,sentido,agresor){
+	//var yo = nickname;
 	var valor = parseInt(bala.css(direccion).replace("px"));
 	bala.css(direccion,(valor + (sentido * 10) + 'px'));
-	var collides = $('.divcito#'+nickname).overlaps(bala);
+	//var collides = $('.divcito#'+yo).overlaps(bala);
+	var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
 	if (collides.hits.length != 0) {
-		console.log(collides);
-		console.log('chocado');
+		var herido = $(collides.targets[0]).attr('id');
+		console.log('chocado '+agresor+ ' el herido es '+herido);
+		bala.remove();
 	}
 }
 
-socket.on('disparo',function(code,left,top){
-	disparar(code,left,top,false);
+socket.on('disparo',function(code,left,top,agresor){
+	disparar(code,left,top,agresor);
 });

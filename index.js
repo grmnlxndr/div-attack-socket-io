@@ -81,8 +81,8 @@ io.on('connection', function(socket){
 		}
 	});
 
-	socket.on('disparo', function(code,left,top){
-		socket.broadcast.emit('disparo',code,left,top);
+	socket.on('disparo', function(code,left,top,agresor){
+		socket.broadcast.emit('disparo',code,left,top,agresor);
 	});
 });
 

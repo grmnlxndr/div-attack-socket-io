@@ -161,6 +161,11 @@ function disparar(code,left,top,local){
 function mover(bala,direccion,sentido){
 	var valor = parseInt(bala.css(direccion).replace("px"));
 	bala.css(direccion,(valor + (sentido * 10) + 'px'));
+	var collides = $('.divcito#'+nickname).overlaps(bala);
+	if (collides.hits.length != 0) {
+		console.log(collides);
+		console.log('chocado');
+	}
 }
 
 socket.on('disparo',function(code,left,top){

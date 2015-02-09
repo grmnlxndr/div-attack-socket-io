@@ -3,6 +3,7 @@ var socket = io();
 
 var nickname; // Nombre propio
 var conectados = []; // Nombre de los jugadores
+var lifes = []; //Vidas de los jugadores ?????
 var disparos = 5; // Disparos permitidos
 
 // Ocultar error y pantalla principal
@@ -31,7 +32,7 @@ $('form#login').submit(function() {
 	socket.emit('ingresar', nickname);
 
 	// Agregar el div propio para jugar
-	$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
+	$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
 
 	// Darle movimiento con el click y arrastrar
 	$('#'+nickname).mousemove(function(e) {
@@ -64,14 +65,14 @@ $('form#login').submit(function() {
 });
 
 // Recepción de todos los otros jugadores por parte del servidor
-socket.on('inicio', function(users, left, top) {
+socket.on('inicio', function(users, left, top, lifes) {
 	
 	// Llenar la lista de demás jugadores
 	conectados = users;
 
 	// Agregar un div por cada jugador y posicionarlo en la ubicación actual
 	for (var i = 0; i < users.length; i++) {
-		$('div#display').append($('<div class="divcito" id="'+ users[i] +'"><div id="text"><h3>'+users[i]+'</h3><p>Se mueve solo</p><p>:)</p></div></div>'));
+		$('div#display').append($('<div class="divcito" id="'+ users[i] +'"><div id="text"><h3>'+users[i]+'</h3><p class="life">'+ lifes[i] +'</p><p>Se mueve solo</p><p>:)</p></div></div>'));
 		$('.divcito#'+users[i]).css('left',left[i]).css('top',top[i]);
 
 		//agregar a la lista de conectados
@@ -86,7 +87,7 @@ socket.on('nuevo user', function(user) {
 	conectados.push(user);
 
 	// Agregar div de nuevo usuario
-	$('div#display').append($('<div class="divcito" id="'+ user +'"><div id="text"><h3>'+user+'</h3><p>Se mueve solo</p><p>:)</p></div></div>'));
+	$('div#display').append($('<div class="divcito" id="'+ user +'"><div id="text"><h3>'+user+'</h3><p class="life">100</p><p>Se mueve solo</p><p>:)</p></div></div>'));
 	$('.divcito#'+user).css('left','50px').css('top','50px');
 
 	// Agregar a la lista de usuarios conectados
@@ -164,13 +165,20 @@ function mover(bala,direccion,sentido,agresor){
 	bala.css(direccion,(valor + (sentido * 10) + 'px'));
 	//var collides = $('.divcito#'+yo).overlaps(bala);
 	var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
-	if (collides.hits.length != 0) {
+	if (collides.targets.length != 0) {
 		var herido = $(collides.targets[0]).attr('id');
 		console.log('chocado '+agresor+ ' el herido es '+herido);
 		bala.remove();
+		if(herido === nickname){
+			socket.emit('herido',herido,agresor);
+		}
 	}
 }
 
 socket.on('disparo',function(code,left,top,agresor){
 	disparar(code,left,top,agresor);
+});
+
+socket.on('heridolife',function(herido,agresor,life){
+	$('.divcito#' + herido + ' .life').text(life);
 });

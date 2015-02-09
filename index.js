@@ -16,6 +16,7 @@ app.get('/', function(req, res){
 var left = [];
 var top = [];
 var users = [];
+var lifes = [];
 
 // iniciar arreglo de sockets
 var sockets = []
@@ -24,7 +25,7 @@ var sockets = []
 io.on('connection', function(socket){
 
 	// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados
-	socket.emit('inicio', users, left, top);
+	socket.emit('inicio', users, left, top, lifes);
 
 	// mostrar mje por pantalla del evento
 	console.log('[INFO - CONNECT] un usuario se ha conectado');
@@ -34,7 +35,7 @@ io.on('connection', function(socket){
 		
 		// agregar al usuario en el arreglo
 		users.push(name);
-		
+		lifes.push(100);
 		// iniciar coordenadas 50-50
 		top.push('50px');
 		left.push('50px');
@@ -83,6 +84,12 @@ io.on('connection', function(socket){
 
 	socket.on('disparo', function(code,left,top,agresor){
 		socket.broadcast.emit('disparo',code,left,top,agresor);
+	});
+
+	socket.on('herido', function(herido,agresor){
+		var i = users.indexOf(herido);
+		lifes[i] = lifes[i] - (Math.round(Math.random() * 10) + 5);
+		io.sockets.emit('heridolife',herido,agresor, lifes[i]);
 	});
 });
 

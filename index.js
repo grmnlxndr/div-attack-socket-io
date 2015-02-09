@@ -90,7 +90,12 @@ io.on('connection', function(socket){
 	socket.on('herido', function(herido,agresor){
 		var i = users.indexOf(herido);
 		lifes[i] = lifes[i] - (Math.round(Math.random() * 10) + 5);
-		io.sockets.emit('heridolife',herido,agresor, lifes[i]);
+		if (lifes[i] <= 0) {
+			lifes[i] = 0;
+			io.sockets.emit('0hp', herido, agresor);
+		} else {
+			io.sockets.emit('heridolife',herido,agresor, lifes[i]);
+		};
 	});
 });
 

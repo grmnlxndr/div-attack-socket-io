@@ -188,3 +188,18 @@ socket.on('disparo',function(code,left,top,agresor){
 socket.on('heridolife',function(herido,agresor,life){
 	$('.divcito#' + herido + ' .life').text(life);
 });
+
+socket.on('0hp', function(herido, agresor){
+	$('.divcito#' + herido + ' .life').text(0);
+	$('.divcito#' + herido).animate({
+		left : '-=50px',
+		top : '-=50px',
+		width : '200px',
+		height : '200px',
+		'background-color' : 'black',
+		opacity : 0,
+	},500);
+	var waitToDeath = setTimeout(function(){
+		$('.divcito#' + herido).remove();	
+	},500);
+});

@@ -91,7 +91,7 @@ $('form#login').submit(function() {
 				socket.emit('disparo',e.keyCode,lft,tp,nickname);
 
 				// Renderizar en pantalla el disparo 
-				disparar(e.keyCode,lft,tp,nickname);
+				//disparar(e.keyCode,lft,tp,nickname);
 			}
 		}
 	});

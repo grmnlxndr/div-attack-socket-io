@@ -88,7 +88,7 @@ io.on('connection', function(socket) {
 	socket.on('disparo', function(code,left,top,agresor) {
 
 		// difundir el evento a todos los clientes
-		socket.broadcast.emit('disparo',code,left,top,agresor);
+		io.sockets.emit('disparo',code,left,top,agresor);
 	});
 
 	// cuando un jugador recibe un impacto de bala

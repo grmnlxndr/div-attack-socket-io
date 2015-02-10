@@ -48,14 +48,26 @@ $('form#login').submit(function() {
 		});
 	});
 
-	// Darle opción de disparo
-	$(document).keydown(function(e){
-		if (disparos > 0){
-			if(e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40){
+	// Darle opción de disparo para las 4 direcciones
+	$(document).keydown(function(e) {
+		
+		// Consultar si se tienen disparos disponibles
+		if (disparos > 0) {
+
+			// Consultar si tecla izquierda, arriba, derecha o abajo esta siendo presionada
+			if(e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
+				
+				// Decrementar cantidad de disparos disponibles
 				disparos = disparos - 1;
+
+				// Obtener coordenadas del div
 				var lft = parseInt($('.divcito#'+nickname).css('left').replace("px",""));
 				var tp = parseInt($('.divcito#'+nickname).css('top').replace("px",""));
-				socket.emit('disparo',e.keyCode,lft,tp,nickname); 
+				
+				// emitir evento de disparo, con coordenadas y dirección
+				socket.emit('disparo',e.keyCode,lft,tp,nickname);
+
+				// Renderizar en pantalla el disparo 
 				disparar(e.keyCode,lft,tp,nickname);
 			}
 		}
@@ -112,7 +124,7 @@ socket.on('div muerto', function(user) {
 	$('.divcito#'+user).remove();
 
 	// Quitar usuario de la lista de usuarios conectados
-	$('ul#usuariosUl li').filter(function(index){ return $(this).text() === user; }).remove();
+	$('ul#usuariosUl li').filter(function(index) { return $(this).text() === user; }).remove();
 	
 	// Eliminar el usuario de la lista interna de usuarios
 	var index = conectados.indexOf(user);
@@ -121,76 +133,116 @@ socket.on('div muerto', function(user) {
     }
 });
 
-//Disparar una flecha
-function disparar(code,left,top,agresor){
-	var fondo = $('div#display');
-	var bala = $('<div class="flecha"></div>');
-	var direc = "";
-	var sent = 1;
+//Disparar una flecha (o bala)
+function disparar(code,left,top,agresor) {
+
+	var fondo = $('div#display'); // Obtener campo de batalla
+	var bala = $('<div class="flecha"></div>'); // Nueva bala
+	var direc; // Dirección de la bala
+	var sent; // Sentido de la bala
+	
+	// Según tecla presionada, dibujar la bala en lugar correspondiente
+	// así como también el sentido y la dirección
+	
 	//Izquierda
-	if(code === 37){
+	if(code === 37) {
 		bala.css("left",(left-20)+'px').css("top",(top+45)+'px');
 		direc = "left";
 		sent = -1;
-	}
+	};
+	
 	//Arriba
-	if(code === 38){
+	if(code === 38) {
 		bala.css("left",(left+45)+'px').css("top",(top-20)+'px');
 		direc = "top";
 		sent = -1;
-	}
+	};
+	
 	//Derecha
-	if(code === 39){
+	if(code === 39) {
 		bala.css("left",(left+110)+'px').css("top",(top+45)+'px');
 		direc = "left";
 		sent = 1;
-	}
+	};
+	
 	//Abajo
-	if(code === 40){
+	if(code === 40) {
 		bala.css("left",(left+45)+'px').css("top",(top+110)+'px');
 		direc = "top";
 		sent = 1;
-	}
+	};
+
+	// Agregar la bala al campo de batalla
 	fondo.append(bala);
-	var movBala = setInterval(function(){ if (bala) {mover(bala,direc,sent,agresor)} }, 50);
+
+	// Asignarle movimiento a la bala
+	var movBala = setInterval(
+		function() {
+			// Si la bala no ha colisionado con algún div, mover la bala
+			if (bala) {
+				mover(bala,direc,sent,agresor)
+			};
+		}, 50);
+
+	// Detener y desaparecer la bala luego de 5 segundos
 	var stop = setTimeout(
-		function(){ 
+		function() { 
 			window.clearInterval(movBala); 
-			bala.remove(); 
-			if(agresor === nickname){ 
+			bala.remove();
+
+			// en caso de que la bala sea del jugador, aumentar el número de disparos disponibles 
+			if (agresor === nickname) { 
 				disparos=disparos+1; 
 			};
 		}, 5000);
-}
+};
 
 // Mueve las balas
-function mover(bala,direccion,sentido,agresor){
+function mover(bala,direccion,sentido,agresor) {
 	
+	// obtener posicion X o Y actual (según direción horizontal o vertical)
 	var valor = parseInt(bala.css(direccion).replace("px"));
+
+	// cambiar la posición en 10px
 	bala.css(direccion,(valor + (sentido * 10) + 'px'));
+
+	// Controlar la colisión
 	var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
+
+	// en caso de que exista colisión, el número de objetivos será mayor a cero
 	if (collides.targets.length != 0) {
+
+		// obtener al que recibió la bala
 		var herido = $(collides.targets[0]).attr('id');
 		console.log('chocado '+agresor+ ' el herido es '+herido);
+		
+		// eliminar la bala
 		bala.remove();
+
+		// en caso de que el que recibió la bala sea el jugador, emitir evento al servidor
 		if(herido === nickname){
 			socket.emit('herido',herido,agresor);
 		}
 	}
-}
+};
 
-// Escuchar los disparos de los demás jugadores
-socket.on('disparo',function(code,left,top,agresor){
+// Escuchar los disparos de los demás jugadores, y renderizar la bala
+socket.on('disparo',function(code,left,top,agresor) {
 	disparar(code,left,top,agresor);
 });
 
-// Escuchar a los heridos de balas
-socket.on('heridolife',function(herido,agresor,life){
+// Escuchar a los heridos de balas y cambiar el indicador de vida del jugador
+socket.on('heridolife',function(herido,agresor,life) {
 	$('.divcito#' + herido + ' .life').text(life);
 });
 
-socket.on('0hp', function(herido, agresor){
+// Escuchar en caso de que un jugador haya quedado sin vida
+socket.on('0hp', function(herido, agresor) {
+
+	// Poner el indicador de vida en 0
 	$('.divcito#' + herido + ' .life').text(0);
+
+	// Realizar una animación loca de muerte
 	$('.divcito#' + herido).animate({
 		left : '-=50px',
 		top : '-=50px',
@@ -199,7 +251,9 @@ socket.on('0hp', function(herido, agresor){
 		'background-color' : 'black',
 		opacity : 0,
 	},500);
-	var waitToDeath = setTimeout(function(){
+
+	// Esperar hasta que termine la animación y eliminar el div
+	var waitToDeath = setTimeout(function() {
 		$('.divcito#' + herido).remove();	
 	},500);
 });

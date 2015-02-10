@@ -12,7 +12,7 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
-// iniciar arreglos de usuarios, posición X e Y
+// iniciar arreglos de usuarios, posición X e Y y las vidas
 var left = [];
 var top = [];
 var users = [];
@@ -35,6 +35,7 @@ io.on('connection', function(socket){
 		
 		// agregar al usuario en el arreglo
 		users.push(name);
+		// iniciar vida en 100
 		lifes.push(100);
 		// iniciar coordenadas 50-50
 		top.push('50px');
@@ -83,17 +84,35 @@ io.on('connection', function(socket){
 		}
 	});
 
-	socket.on('disparo', function(code,left,top,agresor){
+	// cuando un jugador realiza un disparo
+	socket.on('disparo', function(code,left,top,agresor) {
+
+		// difundir el evento a todos los clientes
 		socket.broadcast.emit('disparo',code,left,top,agresor);
 	});
 
-	socket.on('herido', function(herido,agresor){
+	// cuando un jugador recibe un impacto de bala
+	socket.on('herido', function(herido,agresor) {
+
+		// obtener el jugador herido
 		var i = users.indexOf(herido);
+
+		// disminuir la vida en un numero aleatorio entre 5 y 15
 		lifes[i] = lifes[i] - (Math.round(Math.random() * 10) + 5);
+
+		// en caos de que la vida sea cero o no
+
 		if (lifes[i] <= 0) {
+
+			// SI LA VIDA QUEDA EN CERO
+			// asignar la vida en el arreglo a 0 y emitir un evento de que
+			// un jugador ha quedado sin vida
 			lifes[i] = 0;
 			io.sockets.emit('0hp', herido, agresor);
 		} else {
+
+			// SI LA VIDA NO QUEDA EN CERO
+			// emitir un evento que un jugador ha sido herido
 			io.sockets.emit('heridolife',herido,agresor, lifes[i]);
 		};
 	});

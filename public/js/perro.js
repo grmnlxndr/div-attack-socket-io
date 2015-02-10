@@ -306,7 +306,7 @@ socket.on('ping',function(seconds,milliseconds){
 	var m = d.getMilliseconds();
 
 	s = s - seconds;
-	m = m - milliseconds;
+	m = (m + (s*1000)) - milliseconds;
 
-	console.log('Ping: s=' + s + ' ms=' + m);
+	console.log('Ping: ms=' + m);
 });

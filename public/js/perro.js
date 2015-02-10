@@ -57,6 +57,10 @@ $('form#login').submit(function() {
 	$('div#nickname').slideUp(200);
 	$('div#display').slideDown(200);
 	
+	//Verificar lag
+	var d = new Date();
+	socket.emit('ping',d.getSeconds(),d.getMilliseconds());
+
 	// Avisar al server que se ingreso al juego
 	socket.emit('ingresar', nickname);
 
@@ -293,4 +297,16 @@ socket.on('reviviendo',function(username,left,top){
 	if(username === nickname){
 		addMouseFunction();
 	}
+});
+
+//Escuchar el pong
+socket.on('ping',function(seconds,milliseconds){
+	var d = new Date();
+	var s = d.getSeconds();
+	var m = d.getMilliseconds();
+
+	s = s - seconds;
+	m = m - milliseconds;
+
+	console.log('Ping: s=' + s + ' ms=' + m);
 });

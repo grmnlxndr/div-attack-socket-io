@@ -123,6 +123,11 @@ io.on('connection', function(socket) {
 		lifes[i] = 100;
 		io.sockets.emit('reviviendo',username,left[i],top[i]);
 	});
+
+	//Verificando ping
+	socket.on('ping',function(seconds,milliseconds){
+		socket.emit('ping',seconds,milliseconds);
+	});
 });
 
 // iniciar el server en el puerto designado

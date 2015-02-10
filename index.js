@@ -8,7 +8,7 @@ var io = require('socket.io')(http);
 app.use(express.static(__dirname + '/public'));
 
 // Responder con el html cuando se accede a la ruta '/'
-app.get('/', function(req, res){
+app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
@@ -22,7 +22,7 @@ var lifes = [];
 var sockets = []
 
 // captura de eventos por parte del server
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
 
 	// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados
 	socket.emit('inicio', users, left, top, lifes);
@@ -119,6 +119,6 @@ io.on('connection', function(socket){
 });
 
 // iniciar el server en el puerto designado
-http.listen(3000, function(){
+http.listen(3000, function() {
 	console.log('[INFO] escuchando en *:3000');
 });

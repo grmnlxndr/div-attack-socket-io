@@ -8,6 +8,36 @@ var disparos = 5; // Disparos permitidos
 // Ocultar error y pantalla principal
 $('div#display').hide();
 $('#error').hide();
+$('#revivirbtn').hide();
+
+//Funcion para crear divs
+function creaDivs(username, life, left, top){
+	if(username === nickname){
+		$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
+	}
+	else{
+		$('div#display').append($('<div class="divcito" id="'+ username +'"><div id="text"><h3>'+username+'</h3><p class="life">' + life + '</p><p>Se mueve solo</p><p>:)</p></div></div>'));
+	}
+	$('.divcito#'+username).css('left',left).css('top',top);
+}
+
+//Agregar Funcionalidad al div
+function addMouseFunction(){
+	// Darle movimiento con el click y arrastrar
+	$('.divcito#'+nickname).mousedown(function() {
+		$(document).mousemove(function(e) {
+			if (e.which === 1) {
+				$('.divcito#'+nickname).css('left',e.pageX - 50).css('top',e.pageY - 50);
+				
+				// emitir evento de movimiento
+				socket.emit('moviendo div', nickname,$('.divcito#'+nickname).css('left'), $('.divcito#'+nickname).css('top'));
+			};
+		})
+		.mouseup(function() {
+			$(document).off('mousemove');
+		});
+	});
+}
 
 // Cuando se ingresa el nombre de usuario en el formulario de la pantalla principal
 $('form#login').submit(function() {
@@ -31,22 +61,11 @@ $('form#login').submit(function() {
 	socket.emit('ingresar', nickname);
 
 	// Agregar el div propio para jugar
-	$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
-
+	//$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
+	creaDivs(nickname,100,50,50);
+	
 	// Darle movimiento con el click y arrastrar
-	$('#'+nickname).mousedown(function() {
-		$(document).mousemove(function(e) {
-			if (e.which === 1) {
-				$('.divcito#'+nickname).css('left',e.pageX - 50).css('top',e.pageY - 50);
-				
-				// emitir evento de movimiento
-				socket.emit('moviendo div', nickname,$('.divcito#'+nickname).css('left'), $('.divcito#'+nickname).css('top'));
-			};
-		})
-		.mouseup(function() {
-			$(document).off('mousemove');
-		});
-	});
+	addMouseFunction();
 
 	// Darle opción de disparo para las 4 direcciones
 	$(document).keydown(function(e) {
@@ -88,8 +107,9 @@ socket.on('inicio', function(users, left, top, lifes) {
 
 	// Agregar un div por cada jugador y posicionarlo en la ubicación actual
 	for (var i = 0; i < users.length; i++) {
-		$('div#display').append($('<div class="divcito" id="'+ users[i] +'"><div id="text"><h3>'+users[i]+'</h3><p class="life">'+ lifes[i] +'</p><p>Se mueve solo</p><p>:)</p></div></div>'));
-		$('.divcito#'+users[i]).css('left',left[i]).css('top',top[i]);
+		//$('div#display').append($('<div class="divcito" id="'+ users[i] +'"><div id="text"><h3>'+users[i]+'</h3><p class="life">'+ lifes[i] +'</p><p>Se mueve solo</p><p>:)</p></div></div>'));
+		creaDivs(users[i],lifes[i],left[i],top[i]);
+		
 
 		//agregar a la lista de conectados
 		$('ul#usuariosUl').append($('<li></li>').text(users[i]));
@@ -103,15 +123,16 @@ socket.on('nuevo user', function(user) {
 	conectados.push(user);
 
 	// Agregar div de nuevo usuario
-	$('div#display').append($('<div class="divcito" id="'+ user +'"><div id="text"><h3>'+user+'</h3><p class="life">100</p><p>Se mueve solo</p><p>:)</p></div></div>'));
-	$('.divcito#'+user).css('left','50px').css('top','50px');
+	//$('div#display').append($('<div class="divcito" id="'+ user +'"><div id="text"><h3>'+user+'</h3><p class="life">100</p><p>Se mueve solo</p><p>:)</p></div></div>'));
+	creaDivs(user,100,50,50);
+	//$('.divcito#'+user).css('left','50px').css('top','50px');
 
 	// Agregar a la lista de usuarios conectados
 	$('ul#usuariosUl').append($('<li></li>').text(user));
 });
 
 // Evento de movimientos de otros usuarios
-socket.on('moviendo div', function(user, left,top) {
+socket.on('moviendo div', function(user, left, top) {
 	
 	// asignar la nueva posición del div correspondiente
 	$('.divcito#'+user).css('left',left).css('top',top);
@@ -256,4 +277,20 @@ socket.on('0hp', function(herido, agresor) {
 	var waitToDeath = setTimeout(function() {
 		$('.divcito#' + herido).remove();	
 	},500);
+
+	if(herido === nickname){
+		$('#revivirbtn').show();
+	}
+});
+
+function revivir(){
+	socket.emit('reviviendo', nickname);
+	$('#revivirbtn').hide();
+};
+
+socket.on('reviviendo',function(username,left,top){
+	creaDivs(username,100,left,top);
+	if(username === nickname){
+		addMouseFunction();
+	}
 });

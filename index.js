@@ -116,6 +116,13 @@ io.on('connection', function(socket) {
 			io.sockets.emit('heridolife',herido,agresor, lifes[i]);
 		};
 	});
+
+	//Reviviendo usuario
+	socket.on('reviviendo',function(username){
+		var i = users.indexOf(username);
+		lifes[i] = 100;
+		io.sockets.emit('reviviendo',username,left[i],top[i]);
+	});
 });
 
 // iniciar el server en el puerto designado

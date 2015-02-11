@@ -89,7 +89,7 @@ $('form#login').submit(function() {
 				
 				// emitir evento de disparo, con coordenadas y dirección
 				socket.emit('disparo',e.keyCode,lft,tp,nickname);
-
+				
 				// Renderizar en pantalla el disparo 
 				//disparar(e.keyCode,lft,tp,nickname);
 			}
@@ -229,7 +229,7 @@ function mover(bala,direccion,sentido,agresor) {
 	var valor = parseInt(bala.css(direccion).replace("px"));
 
 	// cambiar la posición en 10px
-	bala.css(direccion,(valor + (sentido * 10) + 'px'));
+	bala.css(direccion,(valor + (sentido * 100) + 'px'));
 
 	// Controlar la colisión
 	var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);

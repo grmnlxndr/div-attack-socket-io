@@ -87,12 +87,24 @@ io.on('connection', function(socket) {
 	// cuando un jugador realiza un disparo
 	socket.on('disparo', function(code,left,top,agresor) {
 
+		// Obtener a partir del codigo, las posiciones inicales de las balas
+		// Despues de eso emitir un mje que diga que cree un div bala
+		// con agresor y un data que se unico, quizas basando en un new Date() y .getTime()
+		// ese emit generará en los clientes un div bala
+
+		// luego crear un intervalo, ponele cada 50ms para que mande la nueva ubicación
+		// la bala, enviando la posicion x,y, agresor y timestamp
+
+		// con un timeout poner un evento de morir bala
+
 		// difundir el evento a todos los clientes
 		io.sockets.emit('disparo',code,left,top,agresor);
 	});
 
 	// cuando un jugador recibe un impacto de bala
 	socket.on('herido', function(herido,agresor) {
+
+		// cuando se hiere alguien, emitir un evento de desaparecer bala
 
 		// obtener el jugador herido
 		var i = users.indexOf(herido);

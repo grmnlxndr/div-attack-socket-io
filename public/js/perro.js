@@ -159,101 +159,82 @@ socket.on('div muerto', function(user) {
 });
 
 //Disparar una flecha (o bala)
-function disparar(code,left,top,agresor) {
+function disparar(code,left,top,baladatatype) {
 
 	var fondo = $('div#display'); // Obtener campo de batalla
-	var bala = $('<div class="flecha"></div>'); // Nueva bala
-	var direc; // Dirección de la bala
-	var sent; // Sentido de la bala
-	
-	// Según tecla presionada, dibujar la bala en lugar correspondiente
-	// así como también el sentido y la dirección
-	
-	//Izquierda
-	if(code === 37) {
-		bala.css("left",(left-20)+'px').css("top",(top+45)+'px');
-		direc = "left";
-		sent = -1;
-	};
-	
-	//Arriba
-	if(code === 38) {
-		bala.css("left",(left+45)+'px').css("top",(top-20)+'px');
-		direc = "top";
-		sent = -1;
-	};
-	
-	//Derecha
-	if(code === 39) {
-		bala.css("left",(left+110)+'px').css("top",(top+45)+'px');
-		direc = "left";
-		sent = 1;
-	};
-	
-	//Abajo
-	if(code === 40) {
-		bala.css("left",(left+45)+'px').css("top",(top+110)+'px');
-		direc = "top";
-		sent = 1;
-	};
+	var bala = $('<div class="flecha" data-type="' + baladatatype + '"></div>'); // Nueva bala
+
+	//Cambiar css de la bala. Dibujarla en la posición que corresponda
+	bala.css("left", left).css("top", top);
 
 	// Agregar la bala al campo de batalla
 	fondo.append(bala);
-
-	// Asignarle movimiento a la bala
-	var movBala = setInterval(
-		function() {
-			// Si la bala no ha colisionado con algún div, mover la bala
-			if (bala) {
-				mover(bala,direc,sent,agresor)
-			};
-		}, 50);
-
-	// Detener y desaparecer la bala luego de 5 segundos
-	var stop = setTimeout(
-		function() { 
-			window.clearInterval(movBala); 
-			bala.remove();
-
-			// en caso de que la bala sea del jugador, aumentar el número de disparos disponibles 
-			if (agresor === nickname) { 
-				disparos=disparos+1; 
-			};
-		}, 5000);
 };
 
 // Mueve las balas
-function mover(bala,direccion,sentido,agresor) {
-	
-	// obtener posicion X o Y actual (según direción horizontal o vertical)
-	var valor = parseInt(bala.css(direccion).replace("px"));
+function mover(baladatatype,direccion,sentido,agresor) {
+	// Obtener bala que se va a mover
+	var bala = $('.flecha[data-type="'+ baladatatype +'"]');
 
-	// cambiar la posición en 10px
-	bala.css(direccion,(valor + (sentido * 100) + 'px'));
+	//Si la bala no se obtuvo, es porq ya no existe más
+	if (bala.length != 0){
+		// obtener posicion X o Y actual (según direción horizontal o vertical)
+		var valor = parseInt(bala.css(direccion).replace("px"));
 
-	// Controlar la colisión
-	var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
+		// cambiar la posición en 10px
+		bala.css(direccion,(valor + (sentido * 100) + 'px'));
 
-	// en caso de que exista colisión, el número de objetivos será mayor a cero
-	if (collides.targets.length != 0) {
+		// Controlar la colisión
+		var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
 
-		// obtener al que recibió la bala
-		var herido = $(collides.targets[0]).attr('id');
-		console.log('chocado '+agresor+ ' el herido es '+herido);
-		
-		// eliminar la bala
-		bala.remove();
+		// en caso de que exista colisión, el número de objetivos será mayor a cero
+		if (collides.targets.length != 0) {
 
-		// en caso de que el que recibió la bala sea el jugador, emitir evento al servidor
-		if(herido === nickname){
-			socket.emit('herido',herido,agresor);
-		}
+			// obtener al que recibió la bala
+			var herido = $(collides.targets[0]).attr('id');
+			console.log('chocado '+agresor+ ' el herido es '+herido);
+			
+			//En caso de que la eliminación de la bala sea por servidor, esto no debería ir
+			// eliminar la bala
+			bala.remove();
+
+			// en caso de que el que recibió la bala sea el jugador, emitir evento al servidor
+			if(herido === nickname){
+				socket.emit('herido',herido,agresor);
+			}
+
+			//en caso de que el agresor sea el que disparo la bala que colisionó con alguien
+			//devolverle un disparo
+			if(agresor === nickname){
+				disparos = disparos + 1;
+			}
+		}	
 	}
+	
+};
+
+function morir(baladatatype,agresor){
+	var bala = $('.flecha[data-type="'+ baladatatype +'"]');
+	bala.remove();
+	// en caso de que la bala sea del jugador, aumentar el número de disparos disponibles 
+	if (agresor === nickname) { 
+		disparos = disparos + 1; 
+	};
 };
 
 // Escuchar los disparos de los demás jugadores, y renderizar la bala
-socket.on('disparo',function(code,left,top,agresor) {
-	disparar(code,left,top,agresor);
+socket.on('dispararbala',function(code,left,top,baladatatype) {
+	disparar(code,left,top,baladatatype);
+});
+
+//Escuchar por el movimiento de las balas
+socket.on('moverbala',function(baladatatype,direccion,sentido,agresor){
+	mover(baladatatype,direccion,sentido,agresor);
+});
+
+//Escuchar la muerte de una bala sin colision
+socket.on('matarbala',function(baladatatype,agresor){
+	morir(baladatatype,agresor);
 });
 
 // Escuchar a los heridos de balas y cambiar el indicador de vida del jugador

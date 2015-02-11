@@ -92,7 +92,6 @@ io.on('connection', function(socket) {
 		//Obtener posiciones iniciales según código
 		//Izquierda
 		if(code === 37) {
-			//bala.css("left",(left-20)+'px').css("top",(top+45)+'px');
 			left = left - 20;
 			top = top + 45;
 			direc = "left";
@@ -101,7 +100,6 @@ io.on('connection', function(socket) {
 		
 		//Arriba
 		if(code === 38) {
-			//bala.css("left",(left+45)+'px').css("top",(top-20)+'px');
 			left = left + 45;
 			top = top - 20;
 			direc = "top";
@@ -110,7 +108,6 @@ io.on('connection', function(socket) {
 		
 		//Derecha
 		if(code === 39) {
-			//bala.css("left",(left+110)+'px').css("top",(top+45)+'px');
 			left = left + 110;
 			top = top + 45;
 			direc = "left";
@@ -119,7 +116,6 @@ io.on('connection', function(socket) {
 		
 		//Abajo
 		if(code === 40) {
-			//bala.css("left",(left+45)+'px').css("top",(top+110)+'px');
 			left = left + 45;
 			top = top + 110;
 			direc = "top";
@@ -127,42 +123,43 @@ io.on('connection', function(socket) {
 		};
 
 		// Emitir un mje que diga que cree un div bala
-
-		// con agresor y un data que se unico, quizas basando en un new Date() y .getTime()
+		// con agresor y un data que es único, basado en un new Date() y .getTime()
 		var d = new Date();
 		var data = d.getTime();
 		var baladatatype = agresor + '-' + data;
-		// el emit generará en los clientes un div bala
-		io.sockets.emit("disparo",code,left,top,baladatatype);
+		// Emit para generar en los clientes un div bala
+		io.sockets.emit("dispararbala",code,left,top,baladatatype);
 
 		// Mover la bala
-
 		// cada 50ms se manda la nueva ubicación
-
 		// Asignarle movimiento a la bala
 		var movBala = setInterval(
 			function() {
 				// Si la bala no ha colisionado con algún div, mover la bala
+				//Ver la forma de implementarlo de este lado!
 				//if (bala) {
-					// Se envia la posicion x,y, agresor y timestamp
+
+					// Se envia la posicion x,y, agresor y la identificacion de la bala
 					io.sockets.emit("moverbala",baladatatype,direc,sent,agresor);
 				//};
 			}, 50);
 
 		// con un timeout poner un evento de morir bala
-		// Detener y desaparecer la bala luego de 3 segundos
+		// Detener y desaparecer la bala luego de 5 segundos
 		var stop = setTimeout(
-			function() { 
+			function() {
+				//Borra el temporizador setInterval 
 				clearInterval(movBala);
-				io.sockets.emit('morirbala',baladatatype,agresor); 
-			}, 3000);
-
+				//Emite evento a todos los usuarios para matar la bala
+				io.sockets.emit('matarbala',baladatatype,agresor); 
+			}, 4000); //Bajado período de vida de la bala
 	});
 
 	// cuando un jugador recibe un impacto de bala
 	socket.on('herido', function(herido,agresor) {
 
 		// cuando se hiere alguien, emitir un evento de desaparecer bala
+		//Capaz q no es necesario, pero vemos
 
 		// obtener el jugador herido
 		var i = users.indexOf(herido);

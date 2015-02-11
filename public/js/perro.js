@@ -173,6 +173,7 @@ function disparar(code,left,top,baladatatype) {
 
 // Mueve las balas
 function mover(baladatatype,direccion,sentido,agresor) {
+
 	// Obtener bala que se va a mover
 	var bala = $('.flecha[data-type="'+ baladatatype +'"]');
 
@@ -182,7 +183,7 @@ function mover(baladatatype,direccion,sentido,agresor) {
 		var valor = parseInt(bala.css(direccion).replace("px"));
 
 		// cambiar la posición en 10px
-		bala.css(direccion,(valor + (sentido * 100) + 'px'));
+		bala.css(direccion,(valor + (sentido * 50) + 'px'));
 
 		// Controlar la colisión
 		var collides = $('.divcito:not(#'+agresor+')').overlaps(bala);
@@ -205,9 +206,9 @@ function mover(baladatatype,direccion,sentido,agresor) {
 
 			//en caso de que el agresor sea el que disparo la bala que colisionó con alguien
 			//devolverle un disparo
-			if(agresor === nickname){
+			/*if(agresor === nickname){
 				disparos = disparos + 1;
-			}
+			}*/
 		}	
 	}
 	

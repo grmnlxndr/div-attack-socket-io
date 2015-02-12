@@ -301,5 +301,3 @@ var divApp = (function(){
 	});
 
 })();
-
-//divApp();

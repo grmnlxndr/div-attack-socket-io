@@ -12,11 +12,16 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
+//Constantes del juego
+var SCORE = 100;
+var HITSCORE = 10;
+
 // iniciar arreglos de usuarios, posición X e Y y las vidas
 var left = [];
 var top = [];
 var users = [];
 var lifes = [];
+var scores = [];
 
 // iniciar arreglo de sockets
 var sockets = []
@@ -25,7 +30,7 @@ var sockets = []
 io.on('connection', function(socket) {
 
 	// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados
-	socket.emit('inicio', users, left, top, lifes);
+	socket.emit('inicio', users, left, top, lifes, scores);
 
 	// mostrar mje por pantalla del evento
 	console.log('[INFO - CONNECT] un usuario se ha conectado');
@@ -37,6 +42,8 @@ io.on('connection', function(socket) {
 		users.push(name);
 		// iniciar vida en 100
 		lifes.push(100);
+		// iniciarlizar scores
+		scores.push(0);
 		// iniciar coordenadas 50-50
 		top.push('50px');
 		left.push('50px');
@@ -79,6 +86,7 @@ io.on('connection', function(socket) {
 		    sockets.splice(index, 1);
 		    users.splice(index, 1);
 		    lifes.splice(index, 1);
+		    scores.splice(index, 1);
 		    left.splice(index, 1);
 		    top.splice(index, 1);
 		}
@@ -166,21 +174,31 @@ io.on('connection', function(socket) {
 
 		// disminuir la vida en un numero aleatorio entre 5 y 15
 		lifes[i] = lifes[i] - (Math.round(Math.random() * 10) + 5);
-
+		
+		//searching for the agresor
+		var j = users.indexOf(agresor);
+		
 		// en caso de que la vida sea cero o no
-
 		if (lifes[i] <= 0) {
 
 			// SI LA VIDA QUEDA EN CERO
-			// asignar la vida en el arreglo a 0 y emitir un evento de que
-			// un jugador ha quedado sin vida
+			// asignar la vida en el arreglo a 0 
 			lifes[i] = 0;
-			io.sockets.emit('0hp', herido, agresor);
+			scores[i] = scores[i] - SCORE;
+
+			//Si la vida es cero, quiere decir que agresor mató a herido
+			scores[j] = scores[j] + SCORE;
+
+			//emitir un evento de que un jugador ha quedado sin vida, pasando los puntajes
+			io.sockets.emit('0hp', herido, agresor, scores[i], scores[j]);
 		} else {
 
 			// SI LA VIDA NO QUEDA EN CERO
+			// asignar score
+			scores[j] = scores[j] + HITSCORE;
+
 			// emitir un evento que un jugador ha sido herido
-			io.sockets.emit('heridolife',herido,agresor, lifes[i]);
+			io.sockets.emit('heridolife', herido, agresor, lifes[i], scores[j]);
 		};
 	});
 
@@ -188,7 +206,7 @@ io.on('connection', function(socket) {
 	socket.on('reviviendo',function(username){
 		var i = users.indexOf(username);
 		lifes[i] = 100;
-		io.sockets.emit('reviviendo',username,left[i],top[i]);
+		io.sockets.emit('reviviendo',username,left[i],top[i],scores[i]);
 	});
 
 	//Verificando ping

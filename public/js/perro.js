@@ -5,6 +5,7 @@ var divApp = (function(){
 
 	var nickname; // Nombre propio
 	var conectados = []; // Nombre de los jugadores
+	var puntajes = []; // Puntaje de los jugadores
 	var disparos = 5; // Disparos permitidos
 
 	// Ocultar error y pantalla principal
@@ -13,12 +14,12 @@ var divApp = (function(){
 	$('#revivirbtn').hide();
 
 	//Funcion para crear divs
-	function creaDivs(username, life, left, top){
+	function creaDivs(username, life, score, left, top){
 		if(username === nickname){
-			$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
+			$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p class="score">'+ score +'</p><p>Arrastrame!</p></div></div>'));
 		}
 		else{
-			$('div#display').append($('<div class="divcito" id="'+ username +'"><div id="text"><h3>'+username+'</h3><p class="life">' + life + '</p><p>Se mueve solo</p><p>:)</p></div></div>'));
+			$('div#display').append($('<div class="divcito" id="'+ username +'"><div id="text"><h3>'+username+'</h3><p class="life">' + life + '</p><p class="score">'+ score +'</p><p>ENEMY! TARGET!</p></div></div>'));
 		}
 		$('.divcito#'+username).css('left',left).css('top',top);
 	}
@@ -68,7 +69,7 @@ var divApp = (function(){
 
 		// Agregar el div propio para jugar
 		//$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p>Haceme clic</p><p>y arrastrá</p></div></div>'));
-		creaDivs(nickname,100,50,50);
+		creaDivs(nickname,100,0,50,50);
 		
 		// Darle movimiento con el click y arrastrar
 		addMouseFunction();
@@ -111,16 +112,17 @@ var divApp = (function(){
 	});
 
 	// Recepción de todos los otros jugadores por parte del servidor
-	socket.on('inicio', function(users, left, top, lifes) {
+	socket.on('inicio', function(users, left, top, lifes, scores) {
 		
 		// Llenar la lista de demás jugadores
 		conectados = users;
+		// Llenar la lista de puntajes
+		puntajes = scores;
 
 		// Agregar un div por cada jugador y posicionarlo en la ubicación actual
 		for (var i = 0; i < users.length; i++) {
 			//$('div#display').append($('<div class="divcito" id="'+ users[i] +'"><div id="text"><h3>'+users[i]+'</h3><p class="life">'+ lifes[i] +'</p><p>Se mueve solo</p><p>:)</p></div></div>'));
-			creaDivs(users[i],lifes[i],left[i],top[i]);
-			
+			creaDivs(users[i],lifes[i],scores[i],left[i],top[i]);
 
 			//agregar a la lista de conectados
 			$('ul#usuariosUl').append($('<li></li>').text(users[i]));
@@ -132,10 +134,11 @@ var divApp = (function(){
 		
 		// Agregar nuevo usuario a la lista de conectados
 		conectados.push(user);
+		puntajes.push(0);
 
 		// Agregar div de nuevo usuario
 		//$('div#display').append($('<div class="divcito" id="'+ user +'"><div id="text"><h3>'+user+'</h3><p class="life">100</p><p>Se mueve solo</p><p>:)</p></div></div>'));
-		creaDivs(user,100,50,50);
+		creaDivs(user,100,0,50,50);
 		//$('.divcito#'+user).css('left','50px').css('top','50px');
 
 		// Agregar a la lista de usuarios conectados
@@ -162,6 +165,7 @@ var divApp = (function(){
 		var index = conectados.indexOf(user);
 		if (index > -1) {
 		    conectados.splice(index, 1);
+		    puntajes.splice(index, 1);
 	    }
 	});
 
@@ -246,15 +250,26 @@ var divApp = (function(){
 	});
 
 	// Escuchar a los heridos de balas y cambiar el indicador de vida del jugador
-	socket.on('heridolife',function(herido,agresor,life) {
+	socket.on('heridolife',function(herido,agresor,life,scoreagresor) {
+		var i = conectados.indexOf(agresor);
+		puntajes[i] = scoreagresor;
 		$('.divcito#' + herido + ' .life').text(life);
+		$('.divcito#' + agresor + ' .score').text(scoreagresor);
 	});
 
 	// Escuchar en caso de que un jugador haya quedado sin vida
-	socket.on('0hp', function(herido, agresor) {
+	socket.on('0hp', function(herido, agresor, scoreherido, scoreagresor) {
+		var i = conectados.indexOf(herido);
+		puntajes[i] = scoreherido;
+		var j = conectados.indexOf(agresor);
+		puntajes[j] = scoreagresor;
 
 		// Poner el indicador de vida en 0
 		$('.divcito#' + herido + ' .life').text(0);
+
+		// Sumar los scores
+		$('.divcito#' + herido + ' .score').text(scoreherido);
+		$('.divcito#' + agresor + ' .score').text(scoreagresor);
 
 		// Realizar una animación loca de muerte
 		$('.divcito#' + herido).animate({
@@ -281,8 +296,8 @@ var divApp = (function(){
 		$('#revivirbtn').hide();
 	};
 
-	socket.on('reviviendo',function(username,left,top){
-		creaDivs(username,100,left,top);
+	socket.on('reviviendo',function(username,left,top,score){
+		creaDivs(username,100,score,left,top);
 		if(username === nickname){
 			addMouseFunction();
 		}

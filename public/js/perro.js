@@ -83,16 +83,19 @@ var divApp = (function(){
 				// Consultar si tecla izquierda, arriba, derecha o abajo esta siendo presionada
 				if(e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
 					
-					// Decrementar cantidad de disparos disponibles
-					disparos = disparos - 1;
+					// Pregunta por si está vivo el divcito
+					if ($('.divcito#'+nickname).length != 0) {
+					
+						// Decrementar cantidad de disparos disponibles
+						disparos = disparos - 1;
 
-					// Obtener coordenadas del div
-					var lft = parseInt($('.divcito#'+nickname).css('left').replace("px",""));
-					var tp = parseInt($('.divcito#'+nickname).css('top').replace("px",""));
-					
-					// emitir evento de disparo, con coordenadas y dirección
-					socket.emit('disparo',e.keyCode,lft,tp,nickname);
-					
+						// Obtener coordenadas del div
+						var lft = parseInt($('.divcito#'+nickname).css('left').replace("px",""));
+						var tp = parseInt($('.divcito#'+nickname).css('top').replace("px",""));
+						
+						// emitir evento de disparo, con coordenadas y dirección
+						socket.emit('disparo',e.keyCode,lft,tp,nickname);
+					}
 					// Renderizar en pantalla el disparo 
 					//disparar(e.keyCode,lft,tp,nickname);
 				}

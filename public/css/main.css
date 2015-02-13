@@ -8,7 +8,8 @@ body {
 div#nickname {
 	height: 100vh;
 	width: 100vw;
-	background: darkcyan;
+	background: url('/img/menu.jpg') center center;
+	background-size: 100% 120%; 
 	overflow: hidden;
 	display: flex;
 	align-items: center;
@@ -16,7 +17,8 @@ div#nickname {
 }
 
 div#nickname div#form {
-	background-color: darkblue;
+	background-color: rgba(25,25,112,0.5);
+	box-shadow: 0px 0px 15px 5px midnightblue;
 	color: white;
 	text-align: center;
 	padding: 20px;
@@ -24,7 +26,7 @@ div#nickname div#form {
 }
 
 div#nickname div#form input#nickInput {
-	background: darkblue;
+	background: transparent;
 	border-width: 0 0 3px 0;
 	border-color: white;
 	color: white;
@@ -40,6 +42,7 @@ div#nickname div#form input#nickInput:focus {
 
 div#nickname div#form button#ingresar {
 	background: darkcyan;
+	box-shadow: 0px 0px 2px 1px darkcyan;
 	color: white;
 	padding: 5px;
 	font-weight: bold;
@@ -59,7 +62,8 @@ h2#fachero {
 div#display {
 	height: 100vh;
 	width: 100vw;
-	background: aliceblue;
+	background: url('/img/background.jpg');
+	background-size: 100% 100%;
 	overflow: hidden;
 }
 button#revivirbtn{
@@ -150,7 +154,8 @@ tr#tu {
 }
 
 div.flecha{
-	background-color: black;
+	background-color: lightgreen;
+	border: 1px darkgrey;
 	width: 10px;
 	height: 10px;
 	position: absolute;

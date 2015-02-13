@@ -73,7 +73,7 @@ button#revivirbtn{
 	cursor: pointer;
 }
 
-div.divcito {
+div.divcito, div.dying {
 	background: red;
 	width: 100px;
 	height: 100px;
@@ -90,7 +90,7 @@ div.divcito {
 	font-size: 0.70em;
 }
 
-div.divcito p, div.divcito h3 {
+div.divcito p, div.divcito h3, div.dying p, div.dying h3 {
 	cursor: default;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;

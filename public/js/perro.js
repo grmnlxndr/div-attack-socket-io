@@ -291,8 +291,11 @@ var divApp = (function(){
 		$('table#usuariosUl tr.' + herido + ' td.score').text(scoreherido);
 		$('table#usuariosUl tr.' + agresor + ' td.score').text(scoreagresor);
 
+		//Cambiandole de clase divcito a otra clase (dying), entonces, no va a detectar la colisión
+		$('.divcito#' + herido).removeClass("divcito").addClass("dying");
+
 		// Realizar una animación loca de muerte
-		$('.divcito#' + herido).animate({
+		$('.dying#' + herido).animate({
 			left : '-=50px',
 			top : '-=50px',
 			width : '200px',
@@ -303,7 +306,7 @@ var divApp = (function(){
 
 		// Esperar hasta que termine la animación y eliminar el div
 		var waitToDeath = setTimeout(function() {
-			$('.divcito#' + herido).remove();	
+			$('.dying#' + herido).remove();	
 		},500);
 
 		if(herido === nickname){

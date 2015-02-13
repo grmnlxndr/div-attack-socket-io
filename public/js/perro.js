@@ -100,7 +100,10 @@ var divApp = (function(){
 		});
 
 		// Agregarse a sí mismo a la lista de usuarios conectados
-		$('ul#usuariosUl').append($('<li id="tu"></li>').text(nickname));
+		var tr = $('<tr class="' + nickname + '"id="tu"></tr>');
+		$('table#usuariosUl').append(tr.append($('<td class="username"></td>').text(nickname)));
+		tr.append($('<td class="life"></td>').text(100));
+		tr.append($('<td class="score"></td>').text(0));
 
 		// Para que no realize el post
 		return false;
@@ -122,10 +125,15 @@ var divApp = (function(){
 		// Agregar un div por cada jugador y posicionarlo en la ubicación actual
 		for (var i = 0; i < users.length; i++) {
 			//$('div#display').append($('<div class="divcito" id="'+ users[i] +'"><div id="text"><h3>'+users[i]+'</h3><p class="life">'+ lifes[i] +'</p><p>Se mueve solo</p><p>:)</p></div></div>'));
-			creaDivs(users[i],lifes[i],scores[i],left[i],top[i]);
-
+			if (lifes[i] > 0) { 
+				creaDivs(users[i],lifes[i],scores[i],left[i],top[i]);
+			};
+			
 			//agregar a la lista de conectados
-			$('ul#usuariosUl').append($('<li></li>').text(users[i]));
+			var tr = $('<tr class="' + users[i] + '"></tr>');
+			$('table#usuariosUl').append(tr.append($('<td class="username"></td>').text(users[i])));
+			tr.append($('<td class="life"></td>').text(lifes[i]));
+			tr.append($('<td class="score"></td>').text(scores[i]));
 		};
 	});
 
@@ -142,7 +150,12 @@ var divApp = (function(){
 		//$('.divcito#'+user).css('left','50px').css('top','50px');
 
 		// Agregar a la lista de usuarios conectados
-		$('ul#usuariosUl').append($('<li></li>').text(user));
+		//$('table#usuariosUl').append($('<li></li>').text(user));
+		var tr = $('<tr class="' + user + '"></tr>');
+		$('table#usuariosUl').append(tr.append($('<td class="username"></td>').text(user)));
+		tr.append($('<td class="life"></td>').text(100));
+		tr.append($('<td class="score"></td>').text(0));
+
 	});
 
 	// Evento de movimientos de otros usuarios
@@ -159,7 +172,7 @@ var divApp = (function(){
 		$('.divcito#'+user).remove();
 
 		// Quitar usuario de la lista de usuarios conectados
-		$('ul#usuariosUl li').filter(function(index) { return $(this).text() === user; }).remove();
+		$('table#usuariosUl tr.' + user).remove();
 		
 		// Eliminar el usuario de la lista interna de usuarios
 		var index = conectados.indexOf(user);
@@ -255,6 +268,10 @@ var divApp = (function(){
 		puntajes[i] = scoreagresor;
 		$('.divcito#' + herido + ' .life').text(life);
 		$('.divcito#' + agresor + ' .score').text(scoreagresor);
+
+		// modificar los valores de puntaje y vida del div de usuarios conectados
+		$('table#usuariosUl tr.' + herido + ' td.life').text(life);
+		$('table#usuariosUl tr.' + agresor + ' td.score').text(scoreagresor);
 	});
 
 	// Escuchar en caso de que un jugador haya quedado sin vida
@@ -266,10 +283,13 @@ var divApp = (function(){
 
 		// Poner el indicador de vida en 0
 		$('.divcito#' + herido + ' .life').text(0);
+		$('table#usuariosUl tr.' + herido + ' td.life').text(0);
 
 		// Sumar los scores
 		$('.divcito#' + herido + ' .score').text(scoreherido);
 		$('.divcito#' + agresor + ' .score').text(scoreagresor);
+		$('table#usuariosUl tr.' + herido + ' td.score').text(scoreherido);
+		$('table#usuariosUl tr.' + agresor + ' td.score').text(scoreagresor);
 
 		// Realizar una animación loca de muerte
 		$('.divcito#' + herido).animate({
@@ -301,6 +321,7 @@ var divApp = (function(){
 		if(username === nickname){
 			addMouseFunction();
 		}
+		$('table#usuariosUl tr.' + username + ' td.life').text(100);
 	});
 
 	//Escuchar el pong

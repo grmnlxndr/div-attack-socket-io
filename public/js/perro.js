@@ -8,6 +8,10 @@ var divApp = (function(){
 	var puntajes = []; // Puntaje de los jugadores
 	var disparos = 5; // Disparos permitidos
 
+	// posición del tablero de guerra
+	var battleX;
+	var battleY;
+
 	// Agregado música, hay que subir music.mp3 en la carpeta audio
 	var audio = new Audio('../audio/music.mp3');
 	audio.loop = true;
@@ -35,34 +39,44 @@ var divApp = (function(){
 			$(document).mousemove(function(e) {
 				if (e.which === 1) {
 
+					// obtener posición del puntero
 					var posX = e.pageX;
 					var posY = e.pageY;
 
-					var battleX = $('.battlefield').offset().left;
-					var battleY = $('.battlefield').offset().top;
+					// obtener posición del tablero de juego
+					battleX = $('.battlefield').offset().left;
+					battleY = $('.battlefield').offset().top;
 
+					// en caso de que el puntero esté fuera del tablero
+					// a la izquierda
 					if (posX < (battleX + 50)) {
 						posX = battleX + 50;
 					};
 
+					// a la derecha
 					if (posX > (battleX + 950)) {
 						posX = battleX + 950;
 					};
 
+					// arriba
 					if (posY < (battleY + 50)) {
 						posY = battleY + 50;
 					};
 
+					// abajo
 					if (posY > (battleY + 550)) {
 						posY = battleY + 550;
 					};
 
+					// posicionar el div del jugador
 					$('.divcito#'+nickname).css('left',posX - 50).css('top',posY - 50);
 					
 					// emitir evento de movimiento
 					socket.emit('moviendo div', nickname, posX - 50 - battleX, posY - 50 - battleY);
 				};
 			})
+
+			// al soltar el clic, quitar el evento de mousemove
 			.mouseup(function() {
 				$(document).off('mousemove');
 			});
@@ -113,8 +127,8 @@ var divApp = (function(){
 					// Pregunta por si está vivo el divcito
 					if ($('.divcito#'+nickname).length != 0) {
 						
-						var battleX = $('.battlefield').offset().left;
-						var battleY = $('.battlefield').offset().top;
+						battleX = $('.battlefield').offset().left;
+						battleY = $('.battlefield').offset().top;
 
 						// Decrementar cantidad de disparos disponibles
 						disparos = disparos - 1;
@@ -141,6 +155,14 @@ var divApp = (function(){
 		tr.append($('<td class="score"></td>').text(0));
 
 		audio.play();
+
+		// para no hacer zoom!	
+		$(window).resize(function() {
+			alert('¡No hagas zoom! - Este tiempo se utiliza para que todos puedan moverse y vos pierdas la partida. Gracias por leer esta alerta :)');
+			battleX = $('.battlefield').offset().left;
+			battleY = $('.battlefield').offset().top;
+
+		})
 
 		// Para que no realize el post
 		return false;
@@ -198,8 +220,8 @@ var divApp = (function(){
 	// Evento de movimientos de otros usuarios
 	socket.on('moviendo div', function(user, left, top) {
 		
-		var battleX = $('.battlefield').offset().left;
-		var battleY = $('.battlefield').offset().top;
+		battleX = $('.battlefield').offset().left;
+		battleY = $('.battlefield').offset().top;
 		// asignar la nueva posición del div correspondiente
 		$('.divcito#'+user).css('left',left + battleX).css('top',top + battleY);
 	});
@@ -224,8 +246,8 @@ var divApp = (function(){
 	//Disparar una flecha (o bala)
 	function disparar(code,left,top,baladatatype) {
 
-		var battleX = $('.battlefield').offset().left;
-		var battleY = $('.battlefield').offset().top;
+		battleX = $('.battlefield').offset().left;
+		battleY = $('.battlefield').offset().top;
 
 		var fondo = $('div.battlefield'); // Obtener campo de batalla
 		var bala = $('<div class="flecha" data-type="' + baladatatype + '"></div>'); // Nueva bala

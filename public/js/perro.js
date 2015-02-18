@@ -8,6 +8,10 @@ var divApp = (function(){
 	var puntajes = []; // Puntaje de los jugadores
 	var disparos = 5; // Disparos permitidos
 
+	// Agregado música, hay que subir music.mp3 en la carpeta audio
+	var audio = new Audio('../audio/music.mp3');
+	audio.loop = true;
+
 	// Ocultar error y pantalla principal
 	$('div#display').hide();
 	$('#error').hide();
@@ -16,10 +20,10 @@ var divApp = (function(){
 	//Funcion para crear divs
 	function creaDivs(username, life, score, left, top){
 		if(username === nickname){
-			$('div#display').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p class="score">'+ score +'</p><p>Arrastrame!</p></div></div>'));
+			$('div.battlefield').append($('<div style="z-index:999; background:darkcyan; cursor:pointer" class="divcito" id="'+ nickname +'"><div id="text"><h3>'+nickname+'</h3><p class="life">100</p><p class="score">'+ score +'</p><p>Arrastrame!</p></div></div>'));
 		}
 		else{
-			$('div#display').append($('<div class="divcito" id="'+ username +'"><div id="text"><h3>'+username+'</h3><p class="life">' + life + '</p><p class="score">'+ score +'</p><p>ENEMY! TARGET!</p></div></div>'));
+			$('div.battlefield').append($('<div class="divcito" id="'+ username +'"><div id="text"><h3>'+username+'</h3><p class="life">' + life + '</p><p class="score">'+ score +'</p><p>ENEMY! TARGET!</p></div></div>'));
 		}
 		$('.divcito#'+username).css('left',left).css('top',top);
 	}
@@ -30,10 +34,33 @@ var divApp = (function(){
 		$('.divcito#'+nickname).mousedown(function() {
 			$(document).mousemove(function(e) {
 				if (e.which === 1) {
-					$('.divcito#'+nickname).css('left',e.pageX - 50).css('top',e.pageY - 50);
+
+					var posX = e.pageX;
+					var posY = e.pageY;
+
+					var battleX = $('.battlefield').offset().left;
+					var battleY = $('.battlefield').offset().top;
+
+					if (posX < (battleX + 50)) {
+						posX = battleX + 50;
+					};
+
+					if (posX > (battleX + 950)) {
+						posX = battleX + 950;
+					};
+
+					if (posY < (battleY + 50)) {
+						posY = battleY + 50;
+					};
+
+					if (posY > (battleY + 550)) {
+						posY = battleY + 550;
+					};
+
+					$('.divcito#'+nickname).css('left',posX - 50).css('top',posY - 50);
 					
 					// emitir evento de movimiento
-					socket.emit('moviendo div', nickname,$('.divcito#'+nickname).css('left'), $('.divcito#'+nickname).css('top'));
+					socket.emit('moviendo div', nickname, posX - 50 - battleX, posY - 50 - battleY);
 				};
 			})
 			.mouseup(function() {
@@ -85,7 +112,10 @@ var divApp = (function(){
 					
 					// Pregunta por si está vivo el divcito
 					if ($('.divcito#'+nickname).length != 0) {
-					
+						
+						var battleX = $('.battlefield').offset().left;
+						var battleY = $('.battlefield').offset().top;
+
 						// Decrementar cantidad de disparos disponibles
 						disparos = disparos - 1;
 
@@ -93,6 +123,8 @@ var divApp = (function(){
 						var lft = parseInt($('.divcito#'+nickname).css('left').replace("px",""));
 						var tp = parseInt($('.divcito#'+nickname).css('top').replace("px",""));
 						
+						lft = lft - battleX;
+						tp = tp - battleY;
 						// emitir evento de disparo, con coordenadas y dirección
 						socket.emit('disparo',e.keyCode,lft,tp,nickname);
 					}
@@ -107,6 +139,8 @@ var divApp = (function(){
 		$('table#usuariosUl').append(tr.append($('<td class="username"></td>').text(nickname)));
 		tr.append($('<td class="life"></td>').text(100));
 		tr.append($('<td class="score"></td>').text(0));
+
+		audio.play();
 
 		// Para que no realize el post
 		return false;
@@ -164,8 +198,10 @@ var divApp = (function(){
 	// Evento de movimientos de otros usuarios
 	socket.on('moviendo div', function(user, left, top) {
 		
+		var battleX = $('.battlefield').offset().left;
+		var battleY = $('.battlefield').offset().top;
 		// asignar la nueva posición del div correspondiente
-		$('.divcito#'+user).css('left',left).css('top',top);
+		$('.divcito#'+user).css('left',left + battleX).css('top',top + battleY);
 	});
 
 	// Desconexión de un usuario
@@ -188,11 +224,14 @@ var divApp = (function(){
 	//Disparar una flecha (o bala)
 	function disparar(code,left,top,baladatatype) {
 
-		var fondo = $('div#display'); // Obtener campo de batalla
+		var battleX = $('.battlefield').offset().left;
+		var battleY = $('.battlefield').offset().top;
+
+		var fondo = $('div.battlefield'); // Obtener campo de batalla
 		var bala = $('<div class="flecha" data-type="' + baladatatype + '"></div>'); // Nueva bala
 
 		//Cambiar css de la bala. Dibujarla en la posición que corresponda
-		bala.css("left", left).css("top", top);
+		bala.css("left", left + battleX).css("top", top + battleY);
 
 		// Agregar la bala al campo de batalla
 		fondo.append(bala);

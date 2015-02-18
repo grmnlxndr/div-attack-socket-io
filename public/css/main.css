@@ -65,7 +65,20 @@ div#display {
 	background: url('/img/background.jpg');
 	background-size: 100% 100%;
 	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
 }
+
+div.battlefield {
+	height: 600px;
+	width: 1000px;
+	box-shadow: 0px 0px 5px 3px white;
+	border-radius: 3px;
+	margin: auto;
+}
+
 button#revivirbtn{
 	display: block;
 	background-color: cornsilk;

@@ -298,7 +298,7 @@ var divApp = (function(){
 
 				// obtener al que recibió la bala
 				var herido = $(collides.targets[0]).attr('id');
-				console.log('chocado '+agresor+ ' el herido es '+herido);
+				//console.log('chocado '+agresor+ ' el herido es '+herido);
 				
 				//En caso de que la eliminación de la bala sea por servidor, esto no debería ir
 				// eliminar la bala

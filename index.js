@@ -24,7 +24,7 @@ var lifes = [];
 var scores = [];
 
 // iniciar arreglo de sockets
-var sockets = []
+var sockets = [];
 
 // captura de eventos por parte del server
 io.on('connection', function(socket) {
@@ -104,7 +104,7 @@ io.on('connection', function(socket) {
 			top = top + 45;
 			direc = "left";
 			sent = -1;
-		};
+		}
 		
 		//Arriba
 		if(code === 38) {
@@ -112,7 +112,7 @@ io.on('connection', function(socket) {
 			top = top - 20;
 			direc = "top";
 			sent = -1;
-		};
+		}
 		
 		//Derecha
 		if(code === 39) {
@@ -120,7 +120,7 @@ io.on('connection', function(socket) {
 			top = top + 45;
 			direc = "left";
 			sent = 1;
-		};
+		}
 		
 		//Abajo
 		if(code === 40) {
@@ -128,7 +128,7 @@ io.on('connection', function(socket) {
 			top = top + 110;
 			direc = "top";
 			sent = 1;
-		};
+		}
 
 		// Emitir un mje que diga que cree un div bala
 		// con agresor y un data que es único, basado en un new Date() y .getTime()
@@ -199,7 +199,7 @@ io.on('connection', function(socket) {
 
 			// emitir un evento que un jugador ha sido herido
 			io.sockets.emit('heridolife', herido, agresor, lifes[i], scores[j]);
-		};
+		}
 	});
 
 	//Reviviendo usuario

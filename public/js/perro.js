@@ -168,17 +168,6 @@ var divApp = (function(){
 		// iniciar música de juego
 		audio.play();
 
-		// para no hacer zoom!	
-		$(window).resize(function() {
-
-			// molestar con un alert
-			alert('¡No hagas zoom! - Este tiempo se utiliza para que todos puedan moverse y vos pierdas la partida. Gracias por leer esta alerta :)');
-			
-			// volver a calcular las coordenadas del campo de batallas
-			battleX = $('.battlefield').offset().left;
-			battleY = $('.battlefield').offset().top;
-
-		});
 	}
 
 	// Cuando se ingresa el nombre de usuario en el formulario de la pantalla principal
@@ -193,6 +182,18 @@ var divApp = (function(){
 			$('#error').slideDown(200);
 			return false;
 		}
+
+		// para no hacer zoom!	
+		$(window).resize(function() {
+
+			// molestar con un alert
+			alert('¡No hagas zoom! - Este tiempo se utiliza para que todos puedan moverse y vos pierdas la partida. Gracias por leer esta alerta :)');
+			
+			// volver a calcular las coordenadas del campo de batallas
+			battleX = $('.battlefield').offset().left;
+			battleY = $('.battlefield').offset().top;
+
+		});
 
 		prepararInicio();
 

@@ -4,6 +4,7 @@ var divApp = (function(){
 	var socket = io();
 
 	var nickname; // Nombre propio
+	var puntaje = 0;
 	var conectados = []; // Nombre de los jugadores
 	var puntajes = []; // Puntaje de los jugadores
 	var disparos = 5; // Disparos permitidos
@@ -15,6 +16,19 @@ var divApp = (function(){
 	// iniciar el formulario escondido
 	$('div#form').hide();
 
+	// Ocultar error y pantalla principal
+	$('div#display').hide();
+	$('div#results').hide();
+
+	// asignar acción al boton de volver a jugar
+	$('button#volverAJugar').click(function() {
+		// ver función submit, y separar en una función para la reutilización
+		prepararInicio();
+	});
+
+	$('#error').hide();
+	$('#revivirbtn').hide();
+
 	// Agregado música de batalla, hay que subir music.mp3 en la carpeta audio, y realizar loop
 	var audio = new Audio('../audio/music.mp3');
 	audio.loop = true;
@@ -25,11 +39,6 @@ var divApp = (function(){
 	// mostrar de manera fachera el formulario mientras se ejecuta la musica de inicio
 	$('div#form').fadeIn(5000);
 	initaudio.play();
-
-	// Ocultar error y pantalla principal
-	$('div#display').hide();
-	$('#error').hide();
-	$('#revivirbtn').hide();
 
 	//Funcion para crear divs
 	function creaDivs(username, life, score, left, top){
@@ -93,22 +102,11 @@ var divApp = (function(){
 		});
 	}
 
-	// Cuando se ingresa el nombre de usuario en el formulario de la pantalla principal
-	$('form#login').submit(function() {
-		
-		// Obtener nickname y eliminar los espacios
-		nickname = $('input#nickInput').val();
-		nickname = nickname.replace(/ /g,'-');
-		
-		// Controlar que no exista nadie con el mismo nickname y mostrar error
-		if (conectados.indexOf(nickname) !== -1) {
-			$('#error').slideDown(200);
-			return false;
-		}
-
+	function prepararInicio() {
 		// Pasar a pantalla principal (quitando el error si corresponde)
 		$('#error').slideUp(200);
 		$('div#nickname').slideUp(200);
+		$('div#results').slideUp(200);
 		$('div#display').slideDown(200);
 		
 		//Verificar lag
@@ -157,6 +155,9 @@ var divApp = (function(){
 				}
 			}
 		});
+		
+		// vaciar tabla usuarios
+		$('table#usuariosUl').empty();
 
 		// Agregarse a sí mismo a la lista de usuarios conectados junto con vida y puntaje
 		var tr = $('<tr class="' + nickname + '"id="tu"></tr>');
@@ -178,6 +179,22 @@ var divApp = (function(){
 			battleY = $('.battlefield').offset().top;
 
 		});
+	}
+
+	// Cuando se ingresa el nombre de usuario en el formulario de la pantalla principal
+	$('form#login').submit(function() {
+		
+		// Obtener nickname y eliminar los espacios
+		nickname = $('input#nickInput').val();
+		nickname = nickname.replace(/ /g,'-');
+		
+		// Controlar que no exista nadie con el mismo nickname y mostrar error
+		if (conectados.indexOf(nickname) !== -1) {
+			$('#error').slideDown(200);
+			return false;
+		}
+
+		prepararInicio();
 
 		// Para que no realize el post
 		return false;
@@ -353,6 +370,11 @@ var divApp = (function(){
 		// modificar los valores de puntaje y vida del div de usuarios conectados
 		$('table#usuariosUl tr.' + herido + ' td.life').text(life);
 		$('table#usuariosUl tr.' + agresor + ' td.score').text(scoreagresor);
+
+		if(agresor === nickname) {
+			puntaje = scoreagresor;
+		}
+
 	});
 
 	// Escuchar en caso de que un jugador haya quedado sin vida
@@ -390,9 +412,14 @@ var divApp = (function(){
 			$('.dying#' + herido).remove();	
 		},500);
 
+		if(agresor === nickname) {
+			puntaje = scoreagresor;
+		}
+
 		// mostrar el boton de revivir
 		if(herido === nickname){
 			$('#revivirbtn').show();
+			puntaje = scoreherido;
 		}
 	});
 	
@@ -421,6 +448,46 @@ var divApp = (function(){
 		m = (m + (s*1000)) - milliseconds;
 
 		console.log('Ping: ms=' + m);
+	});
+
+	//escuchar fin de juego
+	socket.on('finJuego', function () {
+		
+		// sacar eventos
+		$('.divcito#'+nickname).off('mousedown');
+		$(document).off('keydown');
+
+		// no debería sacar todos los divs?
+		$('.divcito').remove();
+
+		// mostrar pantalla de resultados
+		$('div#display').slideUp(200);
+		$('div#results').slideDown(200);
+
+		// vaciar table para que muestre el resultado
+		var results = $('table#resultsTable');
+		results.empty();
+
+		// en caso de que alguien termine el juego muerto, ocultar el boton de revivir
+		$('#revivirbtn').hide();
+
+		// appendear los rows
+		var tr = $('<tr><td>' + nickname + '</td><td>' + puntaje + '</td></tr>');
+		results.append(tr);
+
+		for (var i = 0; i < conectados.length; i++) {
+			var row = $('<tr><td>' + conectados[i] + '</td><td>' + puntajes[i] + '</td></tr>');
+			results.append(row);
+		}
+		
+		// detener la musica pegadiza
+		audio.pause();
+		audio.currentTime = 0;
+
+		// vaciar las listas
+		conectados = [];
+		puntajes = [];
+		puntaje = 0;
 	});
 
 })();

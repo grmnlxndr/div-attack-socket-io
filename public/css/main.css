@@ -40,7 +40,8 @@ div#nickname div#form input#nickInput:focus {
 	outline: none;
 }
 
-div#nickname div#form button#ingresar {
+div#nickname div#form button#ingresar,
+div#resultsMedio button#volverAJugar {
 	background: darkcyan;
 	box-shadow: 0px 0px 2px 1px darkcyan;
 	color: white;
@@ -55,7 +56,7 @@ p#error {
 	font-size: 1.2em;
 }
 
-h2#fachero {
+.fachero {
 	text-shadow: 0px 0px 6px cyan;
 }
 
@@ -183,4 +184,38 @@ div.flecha{
 	-ms-user-select: none;
 	user-select: none;
 	z-index:999;	
+}
+
+div#results {
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: url('/img/end.jpg');
+	background-size: 100% 100%;
+}
+
+div#resultsMedio {
+	background-color: rgba(25,25,112,0.5);
+	box-shadow: 0px 0px 15px 5px midnightblue;
+	color: white;
+	text-align: center;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+table#resultsTable {
+	text-align: center;
+	font-weight: bold;
+	width: 100%;
+}
+
+table#resultsTable tr > td:nth-child(1) {
+	text-align: left;
+}
+
+table#resultsTable tr > td:nth-child(2) {
+	text-align: right;
 }

@@ -15,6 +15,7 @@ app.get('/', function(req, res) {
 //Constantes del juego
 var SCORE = 100;
 var HITSCORE = 10;
+var GAMELENGTH = 15000;
 
 // iniciar arreglos de usuarios, posición X e Y y las vidas
 var left = [];
@@ -29,14 +30,14 @@ var sockets = [];
 // captura de eventos por parte del server
 io.on('connection', function(socket) {
 
-	// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados
-	socket.emit('inicio', users, left, top, lifes, scores);
-
 	// mostrar mje por pantalla del evento
 	console.log('[INFO - CONNECT] un usuario se ha conectado');
 	
 	// cuando el usuario se registro con su nickname
 	socket.on('ingresar', function(name) {
+		
+		// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados
+		socket.emit('inicio', users, left, top, lifes, scores);
 		
 		// agregar al usuario en el arreglo
 		users.push(name);
@@ -44,9 +45,9 @@ io.on('connection', function(socket) {
 		lifes.push(100);
 		// iniciarlizar scores
 		scores.push(0);
-		// iniciar coordenadas 50-50
-		top.push('50px');
-		left.push('50px');
+		// iniciar coordenadas 300-300
+		top.push('300px');
+		left.push('300px');
 
 		// agregar al socket en el arreglo
 		sockets.push(socket);
@@ -56,6 +57,21 @@ io.on('connection', function(socket) {
 
 		// difundir evento de nuevo usuario conectado a todos los demas usuarios
 		socket.broadcast.emit('nuevo user', name);
+
+		// inicio juego
+		if (users.length === 2) {
+			console.log('[INFO] Partida Iniciada');
+			var gameTime = setTimeout(function(){
+				users = [];
+				lifes = [];
+				scores = [];
+				top = [];
+				left = [];
+				sockets = [];
+				io.sockets.emit('finJuego');
+				console.log('[INFO] Partida Terminada');
+			}, GAMELENGTH); // editar tiempo de juego en línea 18
+		}
 	});
 
 	// cuando un usuario se mueve guardar las nuevas coordenadas

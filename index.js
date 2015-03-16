@@ -20,7 +20,7 @@ app.get('/credits', function(req, res) {
 //Constantes del juego
 var SCORE = 100;
 var HITSCORE = 10;
-var GAMELENGTH = 120000;
+var GAMELENGTH = 30000;
 
 // iniciar arreglos de usuarios, posición X e Y y las vidas
 var left = [];
@@ -32,6 +32,9 @@ var scores = [];
 // iniciar arreglo de sockets
 var sockets = [];
 
+// variable de tiempo inicio de juego
+var gameStart;
+
 // captura de eventos por parte del server
 io.on('connection', function(socket) {
 
@@ -41,8 +44,20 @@ io.on('connection', function(socket) {
 	// cuando el usuario se registro con su nickname
 	socket.on('ingresar', function(name) {
 		
-		// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados
-		socket.emit('inicio', users, left, top, lifes, scores);
+		// ahora
+		var timeNow;
+
+		// tiempo restante
+		var timeLeft;
+
+		// calcular tiempo restante de juego
+		if (gameStart) {
+			timeNow = new Date().getTime();
+			timeLeft = gameStart + GAMELENGTH - timeNow;
+		}
+
+		// cuando alguien se conecta, se envía todas las ubicaciones de los usuarios conectados y tiempo restante de juego
+		socket.emit('inicio', users, left, top, lifes, scores, timeLeft);
 		
 		// agregar al usuario en el arreglo
 		users.push(name);
@@ -66,6 +81,7 @@ io.on('connection', function(socket) {
 		// inicio juego
 		if (users.length === 2) {
 			console.log('[INFO] Partida Iniciada');
+			gameStart = new Date().getTime();
 			var gameTime = setTimeout(function(){
 				users = [];
 				lifes = [];
@@ -73,9 +89,16 @@ io.on('connection', function(socket) {
 				top = [];
 				left = [];
 				sockets = [];
+				gameStart = "";
 				io.sockets.emit('finJuego');
 				console.log('[INFO] Partida Terminada');
 			}, GAMELENGTH); // editar tiempo de juego en línea 18
+
+			timeNow = new Date().getTime();
+			timeLeft = gameStart + GAMELENGTH - timeNow;
+			
+			io.sockets.emit('begin game', timeLeft);
+
 		}
 	});
 

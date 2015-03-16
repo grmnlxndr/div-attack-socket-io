@@ -35,6 +35,9 @@ var divApp = (function(){
 
 	// Agregado musica de inicio
 	var initaudio = new Audio('../audio/init.mp3');
+
+	// Agregado Audio de alarma fin batalla
+	var beep = new Audio('../audio/beep.mp3');
 	
 	// mostrar de manera fachera el formulario mientras se ejecuta la musica de inicio
 	$('div#form').fadeIn(5000);
@@ -207,12 +210,34 @@ var divApp = (function(){
 	});
 
 	// Recepción de todos los otros jugadores por parte del servidor
-	socket.on('inicio', function(users, left, top, lifes, scores) {
+	socket.on('inicio', function(users, left, top, lifes, scores, timeLeft) {
 		
 		// Llenar la lista de demás jugadores
 		conectados = users;
 		// Llenar la lista de puntajes
 		puntajes = scores;
+
+		if (timeLeft) {
+			// mostrar el timer
+			var timeRemaining = Math.floor(timeLeft/1000);
+			$('#relojleft').text(timeRemaining);
+
+			// actualizar el timer
+			var reloj = setInterval(function() {
+				timeRemaining = timeRemaining - 1;
+				$('#relojleft').text(timeRemaining);
+				if (timeRemaining <= 5) {
+					beep.play();
+				}
+			}, 1000);
+
+			// detener el timer
+			var detenerReloj = setTimeout(function() {
+				clearInterval(reloj);
+				$('#relojleft').text('--');
+			}, timeLeft);
+
+		}
 
 		// Agregar un div por cada jugador y posicionarlo en la ubicación actual
 		for (var i = 0; i < users.length; i++) {
@@ -227,6 +252,29 @@ var divApp = (function(){
 			tr.append($('<td class="life"></td>').text(lifes[i]));
 			tr.append($('<td class="score"></td>').text(scores[i]));
 		}
+	});
+
+	// cuando comienza el juego, iniciar el reloj
+	socket.on('begin game', function(timeLeft) {
+
+		var timeRemaining = Math.floor(timeLeft/1000);
+		$('#relojleft').text(timeRemaining);
+
+		// actualizar el timer
+		var reloj = setInterval(function() {
+			timeRemaining = timeRemaining - 1;
+			$('#relojleft').text(timeRemaining);
+			if (timeRemaining <= 5) {
+				beep.play();
+			}
+		}, 1000);
+
+		// detener el timer
+		var detenerReloj = setTimeout(function() {
+			clearInterval(reloj);
+			$('#relojleft').text('--');
+		}, timeLeft);
+
 	});
 
 	//nuevo usuario conectado

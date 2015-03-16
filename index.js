@@ -12,10 +12,15 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
+// Responder con el html cuando se accede a la ruta '/'
+app.get('/credits', function(req, res) {
+	res.sendFile(__dirname + '/credits.html');
+});
+
 //Constantes del juego
 var SCORE = 100;
 var HITSCORE = 10;
-var GAMELENGTH = 15000;
+var GAMELENGTH = 120000;
 
 // iniciar arreglos de usuarios, posición X e Y y las vidas
 var left = [];

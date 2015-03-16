@@ -41,7 +41,8 @@ div#nickname div#form input#nickInput:focus {
 }
 
 div#nickname div#form button#ingresar,
-div#resultsMedio button#volverAJugar {
+div#resultsMedio button#volverAJugar,
+div#nickname button.button {
 	background: darkcyan;
 	box-shadow: 0px 0px 2px 1px darkcyan;
 	color: white;

@@ -1,0 +1,47 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+div#main {
+	background: url('/img/end.jpg');
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	background-size: 100% 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	flex-direction: column;
+}
+
+div.row {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+}
+
+div#main div.contenido {
+	background-color: rgba(255,255,255,0.75);
+	padding: 15px;
+	border-radius: 10px;
+	text-align: center;
+	box-shadow: 0px 5px 10px 5px #333;
+}
+
+div#main div.contenido > p > a {
+	background: darkcyan;
+	box-shadow: 0px 0px 2px 1px darkcyan;
+	color: white;
+	padding: 5px;
+	font-weight: bold;
+	border: none;
+	text-decoration: none;
+}
+
+div#main div.contenido div.flotante {
+	float: left;
+	padding: 0 4em 0 4em;
+}

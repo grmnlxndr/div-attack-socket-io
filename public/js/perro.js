@@ -209,6 +209,34 @@ var divApp = (function(){
 		revivir();
 	});
 
+	// mostrar y hacer funcionar el relojito
+	function mostrarReloj (timeLeft) {
+		// mostrar el timer
+		var timeRemaining = Math.floor(timeLeft/1000);
+		$('#relojleft').text(timeRemaining);
+
+		// actualizar el timer
+		var reloj = setInterval(function() {
+			timeRemaining = timeRemaining - 1;
+			$('#relojleft').text(timeRemaining);
+			if (timeRemaining <= 5) {
+				beep.play();
+				if (timeRemaining % 2 === 1) {
+					$('#relojleft').css('color','red');
+				} else {
+					$('#relojleft').removeAttr('style');
+				}
+			}
+		}, 1000);
+
+		// detener el timer
+		var detenerReloj = setTimeout(function() {
+			clearInterval(reloj);
+			$('#relojleft').text('--');
+			$('#relojleft').removeAttr('style');
+		}, timeLeft);
+	}
+
 	// Recepción de todos los otros jugadores por parte del servidor
 	socket.on('inicio', function(users, left, top, lifes, scores, timeLeft) {
 		
@@ -218,25 +246,7 @@ var divApp = (function(){
 		puntajes = scores;
 
 		if (timeLeft) {
-			// mostrar el timer
-			var timeRemaining = Math.floor(timeLeft/1000);
-			$('#relojleft').text(timeRemaining);
-
-			// actualizar el timer
-			var reloj = setInterval(function() {
-				timeRemaining = timeRemaining - 1;
-				$('#relojleft').text(timeRemaining);
-				if (timeRemaining <= 5) {
-					beep.play();
-				}
-			}, 1000);
-
-			// detener el timer
-			var detenerReloj = setTimeout(function() {
-				clearInterval(reloj);
-				$('#relojleft').text('--');
-			}, timeLeft);
-
+			mostrarReloj(timeLeft);
 		}
 
 		// Agregar un div por cada jugador y posicionarlo en la ubicación actual
@@ -256,25 +266,7 @@ var divApp = (function(){
 
 	// cuando comienza el juego, iniciar el reloj
 	socket.on('begin game', function(timeLeft) {
-
-		var timeRemaining = Math.floor(timeLeft/1000);
-		$('#relojleft').text(timeRemaining);
-
-		// actualizar el timer
-		var reloj = setInterval(function() {
-			timeRemaining = timeRemaining - 1;
-			$('#relojleft').text(timeRemaining);
-			if (timeRemaining <= 5) {
-				beep.play();
-			}
-		}, 1000);
-
-		// detener el timer
-		var detenerReloj = setTimeout(function() {
-			clearInterval(reloj);
-			$('#relojleft').text('--');
-		}, timeLeft);
-
+		mostrarReloj(timeLeft);
 	});
 
 	//nuevo usuario conectado

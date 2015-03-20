@@ -43,6 +43,12 @@ var divApp = (function(){
 	$('div#form').fadeIn(5000);
 	initaudio.play();
 
+	//Adherir function al select menu de themes
+	$('#theme-menu').change(
+		function(data){
+			console.log($($( "#theme-menu option:selected" )[0]).val());
+		});
+
 	//Funcion para crear divs
 	function creaDivs(username, life, score, left, top){
 		if(username === nickname){
